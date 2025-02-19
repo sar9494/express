@@ -1,24 +1,28 @@
-import fs from'fs'
-
+import fs from 'fs'
+import bcrypt from 'bcrypt';
 export const createUser = (req, res) => {
-    var users=JSON.parse(fs.readFileSync('src/db/users.json'))
-    var isHere = false
-    const { firstName, secondName ,password} = req.body
-console.log(users);
-
-    users.map((el) => {
-        if (el.firstName === firstName && el.secondName === secondName) {
-            console.log('-----', el)
-            isHere = true
+    const { email, password } = req.body
+    try {
+        var users = JSON.parse(fs.readFileSync('src/db/users.json'))
+        const here = users.find((el) => el.email === email)
+        const hashPassword = bcrypt.hashSync(password, 8);
+        if (!here) {
+            users.push({ email: email, password: hashPassword })
+            res.status(201).json({
+                success: true,
+                user: email
+            })
+        } else {
+            res.status(400).json({
+                error: "Bad Request",
+                message: "User signed up"
+            })
         }
-    })
-    if (isHere) {
-        isHere = false
-        res.send("log in ")
-    } else {
-        users.push({ firstName: firstName, secondName: secondName,password:password })
         fs.writeFileSync('src/db/users.json',JSON.stringify(users))
-        isHere = false
-        res.send(users)
+    } catch (e) {
+        res.status(500).json({
+            error: "",
+            message: `Error while creating user ${e}`
+        })
     }
 }
