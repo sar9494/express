@@ -2,7 +2,7 @@ import express from 'express'
 import bcrypt from 'bcrypt';
 import fs from 'fs'
 
-import { createUser } from '../controller/users/create-user.js'
+import { createUser } from '../controller/users/create.user.js'
 export const Authentication = express.Router()
 
 const validateSignUp = (req, res, next) => {
@@ -55,4 +55,3 @@ const validateLogIn =async (req, res, next) => {
 }
 Authentication.post('/signUp', validateSignUp, createUser)
 Authentication.post('/login', validateLogIn, createUser)
-
